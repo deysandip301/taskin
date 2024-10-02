@@ -52,6 +52,12 @@
     background-color: white;
 }
 
+.select-fields{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
 .add-task {
     flex: 1 1 60%; /* Allow the textarea to resize */
     height: 100%;

@@ -15,6 +15,9 @@ let ticketArr = [];
 // Select the due date input
 let dueDateInput = document.querySelector('.due-date-input');
 
+// [NEW] Select the submit button
+let submitBtn = document.querySelector('.submit-btn');
+
 // Initialize the unique id generator
 var uid = new ShortUniqueId();
 
@@ -37,29 +40,39 @@ addBtn.addEventListener('click', function () {
     addModal = !addModal;
 });
 
-// Event listener for adding a task on 'Enter' key press
+// [UPDATED] Event listener for adding a task on 'Ctrl+Enter' key press
 addTask.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && e.ctrlKey) {
         e.preventDefault();
-        if (addTask.value.trim() === "") {
-            alert('Please enter a task');
-            return;
-        }
-        let taskText = addTask.value.trim();
-        let dueDate = dueDateInput.value;
-
-        generateTask(taskText, taskColor, dueDate);
-        addTask.value = "";
-        dueDateInput.value = "";
-        modal.style.display = 'none';
-        addModal = true;
-        // Reset priority selection
-        if (lastClickedPriority) {
-            lastClickedPriority.classList.remove('active');
-        }
-        taskColor = 'light-red'; // Resetting to default color
+        submitTask();
     }
 });
+
+// [NEW] Event listener for submit button click
+submitBtn.addEventListener('click', function () {
+    submitTask();
+});
+
+// [NEW] Function to handle task submission
+function submitTask() {
+    if (addTask.value.trim() === "") {
+        alert('Please enter a task');
+        return;
+    }
+    let taskText = addTask.value.trim();
+    let dueDate = dueDateInput.value;
+
+    generateTask(taskText, taskColor, dueDate);
+    addTask.value = "";
+    dueDateInput.value = "";
+    modal.style.display = 'none';
+    addModal = true;
+    // Reset priority selection
+    if (lastClickedPriority) {
+        lastClickedPriority.classList.remove('active');
+    }
+    taskColor = 'light-red'; // Resetting to default color
+}
 
 // Event listener for selecting priority color in the modal
 prioritySelect.addEventListener('click', function (e) {
@@ -78,9 +91,10 @@ function generateTask(taskText, priorityColor, dueDate, ticketId) {
     let id = ticketId || uid.rnd(); // Use provided id or generate a new one
 
     let ticketCont = document.createElement('div');
-    ticketCont.className = 'ticket-cont';
+    ticketCont.classList.add('ticket-cont' , priorityColor)
     ticketCont.setAttribute('draggable', 'true');
     ticketCont.setAttribute('data-id', id);
+    ticketCont.setAttribute('data-color', priorityColor);
 
     // Updated HTML structure
     ticketCont.innerHTML = `
@@ -245,11 +259,6 @@ columns.forEach(column => {
             ticket.classList.remove(currentColor);
             ticket.classList.add(newColor);
             ticket.setAttribute('data-color', newColor);
-
-            // Update background color of ticket-area
-            let ticketArea = ticket.querySelector('.ticket-area');
-            ticketArea.classList.remove(currentColor);
-            ticketArea.classList.add(newColor);
 
             // Update the color in due-date-status
             let dueDateStatus = ticket.querySelector('.due-date-status');
