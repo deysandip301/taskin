@@ -88,7 +88,7 @@ function generateTask(taskText, priorityColor, dueDate, ticketId) {
             <div class="due-date">${formatDueDate(dueDate)}</div>
             <div class="status-indicator">${getStatusIndicator(dueDate)}</div> 
         </div>
-        <div class="ticket-area ${priorityColor}" contenteditable="false">${taskText}</div>
+        <div class="ticket-area" contenteditable="false">${taskText}</div>
         <div class="lock"><i class="fa-solid fa-lock"></i></div>
     `;
 

@@ -7,7 +7,7 @@
 
 /* Toolbox Styles */
 .toolbox-cont {
-    width: 100vw;
+    width: 100%;
     height: 6rem;
     background-color: black;
     display: flex;
@@ -46,15 +46,15 @@
     border: 1px solid black;
     position: fixed;
     top: 25%;
-    left: 25%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10%); /* Center the modal horizontally */
     z-index: 1;
     background-color: white;
-    flex-direction: row;
 }
 
 .add-task {
+    flex: 1 1 60%; /* Allow the textarea to resize */
     height: 100%;
-    width: 75%;
     border: none;
     outline: none;
     resize: none;
@@ -64,8 +64,8 @@
 }
 
 .priority-color-cont {
+    flex: 1 1 40%; /* Allow the priority color container to resize */
     height: 100%;
-    width: 25%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -82,16 +82,17 @@
 /* Board and Columns Styles */
 .board-cont {
     display: flex;
+    flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
     height: calc(100vh - 6rem);
-    overflow-x: auto;
+    overflow-y: auto; /* Changed overflow-x to overflow-y */
 }
 
 .column {
-    width: 25%;;
-    flex: 1;
+    flex: 1 1 25%; /* Allow columns to resize */
     display: flex;
     flex-direction: column;
     border-right: 1px solid #ccc;
+    min-width: 250px; /* Set a minimum width for columns */
 }
 
 .column:last-child {
@@ -139,7 +140,7 @@
 .ticket-area {
     height: auto;
     background-color: rgb(214, 235, 253);
-    padding: 0.5rem;
+    padding: 5px;
     font-weight: bold;
     font-size: 1rem;
     overflow-y: auto;
@@ -186,15 +187,6 @@
     background-color: #e0e0e0;
 }
 
-.ticket-area {
-    height: auto;
-    background-color: rgb(214, 235, 253);
-    padding: 5px;
-    font-weight: bold;
-    font-size: 1rem;
-    overflow-y: auto    ;
-}
-
 .due-date {
     font-size: 0.9rem;
     color: #ffffff;
@@ -208,3 +200,76 @@
     margin-top: 5px;
 }
 
+/* Responsive Styles */
+/* Adjust the layout for screens smaller than 1200px */
+@media (max-width: 1200px) {
+    .column {
+        flex: 1 1 33.33%;
+    }
+}
+
+/* Adjust the layout for screens smaller than 800px */
+@media (max-width: 800px) {
+    .column {
+        flex: 1 1 50%;
+    }
+}
+
+/* Adjust the layout for screens smaller than 600px */
+@media (max-width: 600px) {
+    .column {
+        flex: 1 1 100%;
+    }
+
+    .toolbox-cont {
+        flex-direction: column;
+        height: auto;
+        padding: 1rem;
+        align-items: flex-start;
+    }
+
+    .action-btn-cont {
+        margin-top: 1rem;
+        width: 100%;
+        justify-content: flex-start;
+        background-color: transparent;
+    }
+
+    .action-btn-cont .add-btn,
+    .action-btn-cont .remove-btn {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+
+    .modal-cont {
+        width: 90%;
+        height: auto;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: column;
+    }
+
+    .add-task {
+        width: 100%;
+        height: 150px;
+        border-right: none;
+        border-bottom: 2px solid black;
+    }
+
+    .priority-color-cont {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .priority-color {
+        height: 3rem;
+        width: 20%;
+    }
+
+    .column-header {
+        font-size: 1.2rem;
+    }
+}
