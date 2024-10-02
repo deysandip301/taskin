@@ -93,7 +93,15 @@ function generateTask(task, priorityColor, ticketId) {
     // Add data-id attribute to ticket for easy selection
     ticketCont.setAttribute('data-id', id);
 
-    mainTicketCont.appendChild(ticketCont);
+    // Append the ticket to the correct column based on its color
+    let targetColumn = document.querySelector(`.main-ticket-cont[data-color="${priorityColor}"]`);
+    if (targetColumn) {
+        targetColumn.appendChild(ticketCont);
+    } 
+    else {
+        // If the column doesn't exist, append to a default column or create the column
+        console.error(`No column found for color: ${priorityColor}`);
+    }
 
     // Add event listeners
     addTicketEventListeners(ticketCont);
@@ -134,23 +142,6 @@ function addTicketEventListeners(ticketCont) {
         }
     });
 
-    // Change priority color on click
-    ticketColor.addEventListener('click', function () {
-        let currentColor = ticketColor.classList[1];
-        let currentIndex = colorMap[currentColor];
-        let newIndex = (currentIndex + 1) % Object.keys(colorMap).length;
-        let newColor = Object.keys(colorMap)[newIndex];
-        ticketColor.classList.remove(currentColor);
-        ticketColor.classList.add(newColor);
-        // Update color in ticketArr
-        for (let i = 0; i < ticketArr.length; i++) {
-            if (ticketArr[i].id == id) {
-                ticketArr[i].color = newColor;
-                break;
-            }
-        }
-        updateLocalStorage();
-    });
 
     // Remove ticket if in remove mode
     ticketCont.addEventListener('click', function () {
