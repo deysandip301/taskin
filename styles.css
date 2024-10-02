@@ -1,156 +1,184 @@
-
-*{
-    margin : 0;
-    padding : 0;
-    box-sizing : border-box;
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.toolbox-cont{
-    width : 100vw;
-    height : 6rem;
+/* Toolbox Styles */
+.toolbox-cont {
+    width: 100vw;
+    height: 6rem;
     background-color: black;
-    display : flex;
-    align-items: center;;
-
+    display: flex;
+    align-items: center;
+    padding-left: 2rem;
 }
 
-.toolbox-priority-cont{
-    height : 3rem;
-    width : 18rem;
+.action-btn-cont {
+    height: 3rem;
+    width: 8rem;
     background-color: aliceblue;
-    margin-left : 5rem;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
 }
 
-.action-btn-cont{
-    height : 3rem;
-    width : 8rem;
-    background-color: aliceblue;
-    margin-left : 5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
+.add-btn {
+    font-size: 1.75rem;
+    cursor: pointer;
 }
 
-.color {
-    height : 1.5rem;
-    width : 3rem;
-    background-color: yellow;
+.remove-btn {
+    font-size: 1.5rem;
+    cursor: pointer;
 }
 
-.red{
+.red {
     color: red;
 }
 
-.light-red{
-    background-color: #f16a70;
-}
-
-.light-green{
-    background-color: #b1d877;
-}
-
-.sky-blue{
-    background-color: #8cdcda;
-}
-
-.grey-black{
-    background-color: #4d4d4d;
-}
-
-.add-btn{
-    font-size: 1.75rem;
-}
-
-.remove-btn{
-    font-size: 1.5rem;
-}
-
-.modal-cont{
-    height : 50vh;
-    width : 50vw;
+/* Modal Styles */
+.modal-cont {
+    height: 50vh;
+    width: 50vw;
     display: none;
-    border : 1px solid black;
+    border: 1px solid black;
     position: fixed;
-    top : 25%;
-    left : 25%;
+    top: 25%;
+    left: 25%;
     z-index: 1;
+    background-color: white;
+    flex-direction: row;
 }
 
-.add-task{
-    height : 100%;
+.add-task {
+    height: 100%;
     width: 75%;
-    border : none;
-    outline : none;
+    border: none;
+    outline: none;
     resize: none;
-    font-size: 2rem;
-    padding : 2rem;
-    border-right : 2px solid black;
+    font-size: 1.5rem;
+    padding: 1rem;
+    border-right: 2px solid black;
 }
 
-
-.priority-color-cont{
-    height : 100%;
+.priority-color-cont {
+    height: 100%;
     width: 25%;
-    display : flex;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-evenly;
     background-color: aliceblue;
 }
 
-.priority-color{
-    height : 3rem;
-    width : 5rem;
+.priority-color {
+    height: 3rem;
+    width: 5rem;
+    cursor: pointer;
 }
 
-
-.main-ticket-cont{
-    margin-top : 1rem;
-    margin-left : 1rem;
-    height : 90vh;
-    width : 98vw;
-    display : flex;
-    flex-wrap : wrap;
-    justify-content: center;
-    align-content: flex-start;
-    gap : 1.5rem;
+/* Board and Columns Styles */
+.board-cont {
+    display: flex;
+    height: calc(100vh - 6rem);
+    overflow-x: auto;
 }
 
-.ticket-cont{
-    height : 10rem;
-    width : 15rem;
+.column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #ccc;
+}
+
+.column:last-child {
+    border-right: none;
+}
+
+.column-header {
+    background-color: #f0f0f0;
+    padding: 1rem;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+}
+
+.main-ticket-cont {
+    flex-grow: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.ticket-cont {
+    height: 10rem;
+    width: 100%;
     background-color: aliceblue;
     display: block;
     position: relative;
+    margin-bottom: 1rem;
+    cursor: move;
 }
 
-.ticket-color{
-    height : 1.2rem;
+.ticket-color {
+    height: 1.2rem;
 }
 
-.ticket-id{
-    height : 1.2rem;
-    font-weight : bold;
+.ticket-id {
+    height: 1.2rem;
+    font-weight: bold;
     background-color: rgb(176, 182, 182);
+    padding: 0.5rem;
 }
 
-.ticket-area{
-    height : calc(10rem - 1.5rem - 1rem);
+.ticket-area {
+    height: calc(10rem - 1.5rem - 1rem);
     background-color: rgb(214, 235, 253);
-    padding : 5px;
-    font-weight : bold;
-    font-size: 1.25rem;
+    padding: 0.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+    overflow-y: auto;
 }
 
 .lock {
-    position : absolute;
-    bottom : 5px;
-    right : 5px;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    cursor: pointer;
 }
 
 .active {
-    border : 1px solid black;
+    border: 1px solid black;
+}
+
+/* Color Styles */
+.light-red {
+    background-color: #f16a70;
+}
+
+.light-green {
+    background-color: #b1d877;
+}
+
+.sky-blue {
+    background-color: #8cdcda;
+}
+
+.grey-black {
+    background-color: #4d4d4d;
+}
+
+.color, .priority-color, .column-header {
+    color: white;
+}
+
+/* Drag and Drop Styles */
+.ticket-cont.dragging {
+    opacity: 0.5;
+}
+
+.main-ticket-cont.over {
+    background-color: #e0e0e0;
 }
