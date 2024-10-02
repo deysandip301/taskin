@@ -182,3 +182,30 @@
 .main-ticket-cont.over {
     background-color: #e0e0e0;
 }
+
+.ticket-area {
+    height: auto;
+    background-color: rgb(214, 235, 253);
+    padding: 5px;
+    font-weight: bold;
+    font-size: 1rem;
+    overflow-y: hidden;
+}
+
+.due-date {
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin-top: 5px;
+}
+
+.status-indicator {
+    font-size: 1rem;
+    font-weight: bold;
+    color: red; /* You can change color based on status if desired */
+    margin-top: 5px;
+}
+
+.ticket-cont {
+    /* If needed, adjust the height to accommodate additional content */
+    min-height: 120px; /* Adjust as necessary */
+}

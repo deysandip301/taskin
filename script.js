@@ -10,9 +10,8 @@ let lastClickedPriority;
 let taskColor = 'light-red';
 let removeBtn = document.querySelector('.remove-btn');
 let removeTasks = false;
-let colorIndex = 0;
-let colorMap = { 'light-red': 0, 'light-green': 1, 'sky-blue': 2, 'grey-black': 3 };
 let ticketArr = [];
+let dueDateInput = document.querySelector('.due-date-input');
 
 // Initialize the unique id generator
 var uid = new ShortUniqueId();
@@ -22,7 +21,7 @@ if (localStorage.getItem('tasks')) {
     let stringifiedArr = localStorage.getItem('tasks');
     ticketArr = JSON.parse(stringifiedArr);
     for (let i = 0; i < ticketArr.length; i++) {
-        generateTask(ticketArr[i].task, ticketArr[i].color, ticketArr[i].id);
+        generateTask(ticketArr[i].task, ticketArr[i].color, ticketArr[i].dueDate, ticketArr[i].id);
     }
 }
 
@@ -30,8 +29,7 @@ if (localStorage.getItem('tasks')) {
 addBtn.addEventListener('click', function () {
     if (addModal) {
         modal.style.display = 'flex'; // show the modal
-    }
-    else {
+    } else {
         modal.style.display = 'none'; // hide the modal
     }
     addModal = !addModal;
@@ -39,15 +37,18 @@ addBtn.addEventListener('click', function () {
 
 // Event listener for adding a task on 'Enter' key press
 addTask.addEventListener('keydown', function (e) {
-    let key = e.key;
-    if (key == 'Enter') {
+    if (e.key === 'Enter') {
         e.preventDefault();
-        if (addTask.value == "") {
+        if (addTask.value.trim() === "") {
             alert('Please enter a task');
             return;
         }
-        generateTask(e.target.value, taskColor);
+        let taskText = addTask.value.trim();
+        let dueDate = dueDateInput.value;
+
+        generateTask(taskText, taskColor, dueDate);
         addTask.value = "";
+        dueDateInput.value = "";
         modal.style.display = 'none';
         addModal = true;
         // Reset priority selection
@@ -58,7 +59,7 @@ addTask.addEventListener('keydown', function (e) {
     }
 });
 
-// Event listener for selecting priority color
+// Event listener for selecting priority color in the modal
 prioritySelect.addEventListener('click', function (e) {
     if (e.target.classList.contains('priority-color')) {
         if (lastClickedPriority) {
@@ -66,50 +67,74 @@ prioritySelect.addEventListener('click', function (e) {
         }
         e.target.classList.add('active');
         lastClickedPriority = e.target;
-        taskColor = e.target.classList[1];
+        taskColor = e.target.classList[1]; // Set the task color based on selection
     }
 });
 
 // Function to generate a task
-function generateTask(task, priorityColor, ticketId) {
-    let id;
-    if (ticketId) {
-        id = ticketId; // Called from local storage, id is available
-    }
-    else {
-        id = uid.rnd(); // Generate new id
-    }
+function generateTask(taskText, priorityColor, dueDate, ticketId) {
+    let id = ticketId || uid.rnd(); // Use provided id or generate a new one
 
     let ticketCont = document.createElement('div');
     ticketCont.className = 'ticket-cont';
-    ticketCont.setAttribute('draggable', 'true'); // Make ticket draggable
+    ticketCont.setAttribute('draggable', 'true');
+    ticketCont.setAttribute('data-id', id);
 
     ticketCont.innerHTML = `
-        <div class="ticket-color ${priorityColor}"></div>
-        <div class="ticket-id">${id}</div>
-        <div class="ticket-area">${task}</div>
+        <div class="due-date ${priorityColor}">${formatDueDate(dueDate)}</div>
+        <div class="ticket-area" contenteditable="false">${taskText}</div>
+        <div class="status-indicator">${getStatusIndicator(dueDate)}</div> 
         <div class="lock"><i class="fa-solid fa-lock"></i></div>
     `;
-    // Add data-id attribute to ticket for easy selection
-    ticketCont.setAttribute('data-id', id);
 
     // Append the ticket to the correct column based on its color
     let targetColumn = document.querySelector(`.main-ticket-cont[data-color="${priorityColor}"]`);
     if (targetColumn) {
         targetColumn.appendChild(ticketCont);
-    } 
-    else {
+    } else {
         // If the column doesn't exist, append to a default column or create the column
         console.error(`No column found for color: ${priorityColor}`);
     }
 
-    // Add event listeners
+    // Add event listeners to the ticket
     addTicketEventListeners(ticketCont);
 
-    // If new task, save to ticketArr and localStorage
+    // If this is a new task (not loaded from localStorage), save it
     if (!ticketId) {
-        ticketArr.push({ task: task, color: priorityColor, id: id });
+        ticketArr.push({ task: taskText, color: priorityColor, dueDate: dueDate, id: id });
         updateLocalStorage();
+    }
+}
+
+// Function to format due date for display
+function formatDueDate(dueDate) {
+    if (dueDate) {
+        let date = new Date(dueDate);
+        return date.toLocaleDateString();
+    } else {
+        return 'No Due Date';
+    }
+}
+
+// Function to get status indicator based on due date
+function getStatusIndicator(dueDate) {
+    if (!dueDate) return '';
+
+    let today = new Date();
+    let due = new Date(dueDate);
+    let diffTime = due - today;
+    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+        return 'Overdue';
+    }
+    else if (diffDays === 0) {
+        return 'Due Today';
+    }
+    else if (diffDays <= 7) {
+        return 'Due Soon';
+    } else {
+        return '';
     }
 }
 
@@ -118,7 +143,6 @@ function addTicketEventListeners(ticketCont) {
     let id = ticketCont.getAttribute('data-id');
     let taskArea = ticketCont.querySelector('.ticket-area');
     let lockIcon = ticketCont.querySelector('.lock i');
-    let ticketColor = ticketCont.querySelector('.ticket-color');
 
     // Lock/Unlock functionality
     lockIcon.addEventListener('click', function () {
@@ -126,8 +150,7 @@ function addTicketEventListeners(ticketCont) {
             lockIcon.classList.remove('fa-lock');
             lockIcon.classList.add('fa-lock-open');
             taskArea.setAttribute('contenteditable', 'true');
-        }
-        else {
+        } else {
             lockIcon.classList.remove('fa-lock-open');
             lockIcon.classList.add('fa-lock');
             taskArea.setAttribute('contenteditable', 'false');
@@ -141,7 +164,6 @@ function addTicketEventListeners(ticketCont) {
             updateLocalStorage();
         }
     });
-
 
     // Remove ticket if in remove mode
     ticketCont.addEventListener('click', function () {
@@ -210,18 +232,19 @@ columns.forEach(column => {
         column.classList.remove('over');
         let id = e.dataTransfer.getData('text/plain');
         let ticket = document.querySelector(`.ticket-cont[data-id="${id}"]`);
+        console.log(ticket)
         if (ticket) {
             // Append the ticket to the new column
             column.appendChild(ticket);
 
-            // Update the ticket color to match the column's color
+            // Update the ticket's color to match the column's color
             let newColor = column.getAttribute('data-color');
             let ticketColorBand = ticket.querySelector('.ticket-color');
             let currentColor = ticketColorBand.classList[1];
             ticketColorBand.classList.remove(currentColor);
             ticketColorBand.classList.add(newColor);
 
-            // Update color in ticketArr
+            // Update the color in ticketArr
             for (let i = 0; i < ticketArr.length; i++) {
                 if (ticketArr[i].id == id) {
                     ticketArr[i].color = newColor;
@@ -235,37 +258,5 @@ columns.forEach(column => {
 
 // ToolBox functionality (if needed)
 toolBoxCont.addEventListener('click', function (e) {
-    let selectedTool = e.target.classList[1];
-    if (e.target.classList.contains('color')) {
-        if (e.target.classList.contains('active')) {
-            toolBoxActive = true;
-        }
-        else {
-            toolBoxActive = false;
-        }
-        for (let i = 0; i < toolBoxCont.children[0].children.length; i++) {
-            toolBoxCont.children[0].children[i].classList.remove('active');
-        }
-        toolBoxActive = !toolBoxActive;
-        if (toolBoxActive) {
-            e.target.classList.add('active');
-            for (let i = 0; i < mainTicketCont.children.length; i++) {
-                let ticket = mainTicketCont.children[i];
-                let ticketColor = ticket.children[0].classList[1];
-                if (selectedTool == ticketColor) {
-                    ticket.style.display = 'block';
-                }
-                else {
-                    ticket.style.display = 'none';
-                }
-            }
-        }
-        else {
-            e.target.classList.remove('active');
-            for (let i = 0; i < mainTicketCont.children.length; i++) {
-                let ticket = mainTicketCont.children[i];
-                ticket.style.display = 'block';
-            }
-        }
-    }
+    // Your existing toolbox functionality (if any)
 });
