@@ -11,6 +11,8 @@ let taskColor = 'light-red';
 let removeBtn = document.querySelector('.remove-btn');
 let removeTasks = false;
 let ticketArr = [];
+
+// Select the due date input
 let dueDateInput = document.querySelector('.due-date-input');
 
 // Initialize the unique id generator
@@ -80,10 +82,13 @@ function generateTask(taskText, priorityColor, dueDate, ticketId) {
     ticketCont.setAttribute('draggable', 'true');
     ticketCont.setAttribute('data-id', id);
 
+    // Updated HTML structure
     ticketCont.innerHTML = `
-        <div class="due-date ${priorityColor}">${formatDueDate(dueDate)}</div>
-        <div class="ticket-area" contenteditable="false">${taskText}</div>
-        <div class="status-indicator">${getStatusIndicator(dueDate)}</div> 
+        <div class="due-date-status ${priorityColor}">
+            <div class="due-date">${formatDueDate(dueDate)}</div>
+            <div class="status-indicator">${getStatusIndicator(dueDate)}</div> 
+        </div>
+        <div class="ticket-area ${priorityColor}" contenteditable="false">${taskText}</div>
         <div class="lock"><i class="fa-solid fa-lock"></i></div>
     `;
 
@@ -92,7 +97,6 @@ function generateTask(taskText, priorityColor, dueDate, ticketId) {
     if (targetColumn) {
         targetColumn.appendChild(ticketCont);
     } else {
-        // If the column doesn't exist, append to a default column or create the column
         console.error(`No column found for color: ${priorityColor}`);
     }
 
@@ -127,11 +131,9 @@ function getStatusIndicator(dueDate) {
 
     if (diffDays < 0) {
         return 'Overdue';
-    }
-    else if (diffDays === 0) {
+    } else if (diffDays === 0) {
         return 'Due Today';
-    }
-    else if (diffDays <= 7) {
+    } else if (diffDays <= 7) {
         return 'Due Soon';
     } else {
         return '';
@@ -150,6 +152,7 @@ function addTicketEventListeners(ticketCont) {
             lockIcon.classList.remove('fa-lock');
             lockIcon.classList.add('fa-lock-open');
             taskArea.setAttribute('contenteditable', 'true');
+            taskArea.focus();
         } else {
             lockIcon.classList.remove('fa-lock-open');
             lockIcon.classList.add('fa-lock');
@@ -232,17 +235,26 @@ columns.forEach(column => {
         column.classList.remove('over');
         let id = e.dataTransfer.getData('text/plain');
         let ticket = document.querySelector(`.ticket-cont[data-id="${id}"]`);
-        console.log(ticket)
         if (ticket) {
             // Append the ticket to the new column
             column.appendChild(ticket);
 
-            // Update the ticket's color to match the column's color
+            // Update the ticket's color class to match the column's color
             let newColor = column.getAttribute('data-color');
-            let ticketColorBand = ticket.querySelector('.ticket-color');
-            let currentColor = ticketColorBand.classList[1];
-            ticketColorBand.classList.remove(currentColor);
-            ticketColorBand.classList.add(newColor);
+            let currentColor = ticket.getAttribute('data-color');
+            ticket.classList.remove(currentColor);
+            ticket.classList.add(newColor);
+            ticket.setAttribute('data-color', newColor);
+
+            // Update background color of ticket-area
+            let ticketArea = ticket.querySelector('.ticket-area');
+            ticketArea.classList.remove(currentColor);
+            ticketArea.classList.add(newColor);
+
+            // Update the color in due-date-status
+            let dueDateStatus = ticket.querySelector('.due-date-status');
+            dueDateStatus.classList.remove(currentColor);
+            dueDateStatus.classList.add(newColor);
 
             // Update the color in ticketArr
             for (let i = 0; i < ticketArr.length; i++) {
